@@ -1,0 +1,5 @@
+generated/
+anchor-go
+.vscode
+.idea
+.anchor
