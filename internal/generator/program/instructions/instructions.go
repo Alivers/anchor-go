@@ -166,6 +166,7 @@ func addInstructionVariants(ctx *model.GenerateCtx, file *File, program *idl.Idl
 		}).Line()
 
 	implDefParam := Line()
+	instNameConverter := helper.ToCamelCase
 	switch ctx.DiscriminatorType {
 	case model.DiscriminatorTypeUvarint32:
 		implDefParam.Qual(model.PkgDfuseBinary, "Uvarint32TypeIDEncoding").Op(",").Line()
@@ -175,8 +176,10 @@ func addInstructionVariants(ctx *model.GenerateCtx, file *File, program *idl.Idl
 		implDefParam.Qual(model.PkgDfuseBinary, "Uint8TypeIDEncoding").Op(",").Line()
 	case model.DiscriminatorTypeAnchor:
 		implDefParam.Qual(model.PkgDfuseBinary, "AnchorTypeIDEncoding").Op(",").Line()
+		instNameConverter = helper.ToRustSnakeCase
 	case model.DiscriminatorTypeDefault:
 		implDefParam.Qual(model.PkgDfuseBinary, "AnchorTypeIDEncoding").Op(",").Line()
+		instNameConverter = helper.ToRustSnakeCase
 	}
 
 	file.Var().Id("InstructionImplDef").Op("=").Qual(model.PkgDfuseBinary, "NewVariantDefinition").
@@ -184,7 +187,7 @@ func addInstructionVariants(ctx *model.GenerateCtx, file *File, program *idl.Idl
 			implDefParam.Index().Qual(model.PkgDfuseBinary, "VariantType").
 				BlockFunc(func(variantBlock *Group) {
 					for _, instruction := range program.Instructions {
-						insName := helper.ToCamelCase(instruction.Name)
+						insName := instNameConverter(instruction.Name)
 						insExportedName := helper.ToCamelCase(instruction.Name)
 						variantBlock.Block(
 							List(Id("Name").Op(":").Lit(insName), Id("Type").Op(":").Parens(Op("*").Id(insExportedName)).Parens(Nil())).Op(","),
