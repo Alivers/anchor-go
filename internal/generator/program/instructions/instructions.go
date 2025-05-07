@@ -176,9 +176,11 @@ func addInstructionVariants(ctx *model.GenerateCtx, file *File, program *idl.Idl
 		implDefParam.Qual(model.PkgDfuseBinary, "Uint8TypeIDEncoding").Op(",").Line()
 	case model.DiscriminatorTypeAnchor:
 		implDefParam.Qual(model.PkgDfuseBinary, "AnchorTypeIDEncoding").Op(",").Line()
+		// NOTE: using `ToSnakeForSighash` here (necessary for sighash computing from instruction name)
 		instNameConverter = helper.ToRustSnakeCase
 	case model.DiscriminatorTypeDefault:
 		implDefParam.Qual(model.PkgDfuseBinary, "AnchorTypeIDEncoding").Op(",").Line()
+		// NOTE: using `ToSnakeForSighash` here (necessary for sighash computing from instruction name)
 		instNameConverter = helper.ToRustSnakeCase
 	}
 
