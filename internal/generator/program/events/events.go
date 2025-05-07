@@ -12,7 +12,7 @@ func GenerateEvents(ctx *model.GenerateCtx, program *idl.Idl) *File {
 	file := helper.NewGoFile(ctx)
 
 	for _, evt := range program.Events {
-		identType := ctx.GetIdentifier(evt.Name)
+		identType := ctx.GetIdentifierTy(evt.Name)
 		if identType == nil {
 			panic("event " + evt.Name + " not found in IDL types")
 		}
@@ -35,7 +35,7 @@ func GenerateEvents(ctx *model.GenerateCtx, program *idl.Idl) *File {
 
 	file.Add(Empty().Var().Id("eventTypes").Op("=").Map(Index(Lit(8)).Byte()).Qual("reflect", "Type").Values(DictFunc(func(d Dict) {
 		for _, evt := range program.Events {
-			if identType := ctx.GetIdentifier(evt.Name); identType != nil {
+			if identType := ctx.GetIdentifierTy(evt.Name); identType != nil {
 				d[Id(evt.Name+"EventDataDiscriminator")] = Id("reflect.TypeOf(" + evt.Name + "EventData{})")
 			}
 		}
@@ -43,7 +43,7 @@ func GenerateEvents(ctx *model.GenerateCtx, program *idl.Idl) *File {
 
 	file.Add(Empty().Var().Id("eventNames").Op("=").Map(Index(Lit(8)).Byte()).String().Values(DictFunc(func(d Dict) {
 		for _, evt := range program.Events {
-			if identType := ctx.GetIdentifier(evt.Name); identType != nil {
+			if identType := ctx.GetIdentifierTy(evt.Name); identType != nil {
 				d[Id(evt.Name+"EventDataDiscriminator")] = Lit(evt.Name)
 			}
 		}

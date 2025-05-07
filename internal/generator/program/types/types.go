@@ -13,21 +13,21 @@ func GenerateTypes(ctx *model.GenerateCtx, program *idl.Idl) *File {
 
 	// Generate types for all IDL types
 	for _, typ := range program.Types {
-		identType := ctx.GetIdentifier(typ.Name)
+		identType := ctx.GetIdentifierTy(typ.Name)
 		if identType == nil {
 			panic("type " + typ.Name + " not found in IDL types")
 		}
 
-		// typeName := typ.Name
-		// if nameOccupied[typ.Name] {
-		// 	typeName += "Struct"
-		// 	file.Comment(typ.Name + " conflict with other type, so we add `Struct` suffix.")
-		// }
+		typeName := typ.Name
+		if ctx.IsGeneratedIdentifier(typ.Name) {
+			typeName += "Struct"
+			file.Comment(typ.Name + " conflict with other type, so we add `Struct` suffix.")
+		}
 
 		file.Add(
 			common.GenerateTypeDefCode(
 				ctx,
-				typ.Name,
+				typeName,
 				identType,
 				nil,
 				program,

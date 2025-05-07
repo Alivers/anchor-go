@@ -44,6 +44,8 @@ func addHeaderComment(file *File, instruction *idl.IdlInstruction) {
 func addInstructionStruct(ctx *model.GenerateCtx, file *File, instExportedName string, instruction *idl.IdlInstruction) {
 	file.Commentf("%s is the `%s` instruction.", instExportedName, instruction.Name)
 
+	ctx.AddGeneratedIdentifier(instExportedName)
+
 	file.Type().Id(instExportedName).StructFunc(func(fieldsGroup *Group) {
 		for _, arg := range instruction.Args {
 			for _, doc := range arg.Docs {

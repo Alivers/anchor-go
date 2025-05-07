@@ -22,22 +22,18 @@ import (
 	ag_utilz "github.com/gagliardetto/utilz"
 
 	"github.com/dave/jennifer/jen"
-	mapset "github.com/deckarep/golang-set/v2"
 )
 
 func Generate(dstFolder string, generateTests bool, program *idl.Idl) {
 	pkgName := helper.ToRustSnakeCase(program.Metadata.Name)
 	dstFolder = path.Join(dstFolder, pkgName)
 
-	ctx := &model.GenerateCtx{
-		PkgName:                pkgName,
-		ProgramName:            program.Metadata.Name,
-		DiscriminatorType:      deriveDiscriminatorType(program),
-		Encoder:                model.EncoderTypeBorsh,
-		AddressTable:           map[string]string{},
-		IdentifierTypeRegistry: map[string]*idl.IdlTypeDefTy{},
-		ComplexEnumRegistry:    mapset.NewSet[string](),
-	}
+	ctx := model.NewGenerateCtx(
+		pkgName,
+		program.Metadata.Name,
+		deriveDiscriminatorType(program),
+		model.EncoderTypeBorsh,
+	)
 
 	registerIdentifiers(ctx, program)
 	registerComplexEnum(ctx, program)

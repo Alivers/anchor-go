@@ -11,15 +11,31 @@ type GenerateCtx struct {
 	DiscriminatorType DiscriminatorType
 	Encoder           EncoderType
 
-	AddressTable           map[string]string
-	IdentifierTypeRegistry map[string]*idl.IdlTypeDefTy
+	AddressTable                map[string]string
+	IdentifierTypeRegistry      map[string]*idl.IdlTypeDefTy
+	GeneratedIdentifierRegistry mapset.Set[string]
 	// Rust enums which contain variant data
 	// e.g. enum Foo { Bar(u8), Baz(Struct) }
 	// These enums will be generated into `interface` which have various variants in Go.
 	ComplexEnumRegistry mapset.Set[string]
 }
 
-func (ctx *GenerateCtx) GetIdentifier(identName string) *idl.IdlTypeDefTy {
+func NewGenerateCtx(packageName, programName string, discriminatorType DiscriminatorType, encoder EncoderType) *GenerateCtx {
+	ctx := &GenerateCtx{
+		PkgName:                     packageName,
+		ProgramName:                 programName,
+		DiscriminatorType:           discriminatorType,
+		Encoder:                     encoder,
+		AddressTable:                map[string]string{},
+		IdentifierTypeRegistry:      map[string]*idl.IdlTypeDefTy{},
+		GeneratedIdentifierRegistry: mapset.NewSet[string](),
+		ComplexEnumRegistry:         mapset.NewSet[string](),
+	}
+
+	return ctx
+}
+
+func (ctx *GenerateCtx) GetIdentifierTy(identName string) *idl.IdlTypeDefTy {
 	if ty, ok := ctx.IdentifierTypeRegistry[identName]; ok {
 		return ty
 	}
@@ -47,4 +63,12 @@ func (ctx *GenerateCtx) IsComplexEnumByType(typ *idl.IdlType) bool {
 		return ctx.IsComplexEnum(typ.GetDefined().Name)
 	}
 	return false
+}
+
+func (ctx *GenerateCtx) IsGeneratedIdentifier(identName string) bool {
+	return ctx.GeneratedIdentifierRegistry.Contains(identName)
+}
+
+func (ctx *GenerateCtx) AddGeneratedIdentifier(identName string) {
+	ctx.GeneratedIdentifierRegistry.Add(identName)
 }

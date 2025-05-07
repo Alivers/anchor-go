@@ -12,7 +12,7 @@ func GenerateAccounts(ctx *model.GenerateCtx, program *idl.Idl) *File {
 	file := helper.NewGoFile(ctx)
 
 	for _, acc := range program.Accounts {
-		identType := ctx.GetIdentifier(acc.Name)
+		identType := ctx.GetIdentifierTy(acc.Name)
 		if identType == nil {
 			panic("account " + acc.Name + " not found in IDL types")
 		}
