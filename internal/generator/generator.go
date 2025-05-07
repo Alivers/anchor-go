@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 
 	"github.com/alivers/anchor-go/internal/generator/helper"
 	"github.com/alivers/anchor-go/internal/generator/model"
@@ -17,6 +18,7 @@ import (
 	"github.com/alivers/anchor-go/internal/generator/program/tests"
 	"github.com/alivers/anchor-go/internal/generator/program/types"
 	"github.com/alivers/anchor-go/internal/idl"
+	"github.com/fatih/color"
 	ag_utilz "github.com/gagliardetto/utilz"
 
 	"github.com/dave/jennifer/jen"
@@ -106,10 +108,19 @@ func Generate(dstFolder string, generateTests bool, program *idl.Idl) {
 
 	ag_utilz.MustCreateFolderIfNotExists(dstFolder, os.ModePerm)
 	for i, file := range files {
-		name := fileName[i]
-		err := file.Save(path.Join(dstFolder, name))
+		dst, err := filepath.Abs(path.Join(dstFolder, fileName[i]))
+		if err != nil {
+			fmt.Printf("Failed to get absolute path for %s: %v\n", fileName[i], err)
+		}
+		err = file.Save(dst)
 		if err != nil {
 			fmt.Printf("%v", err)
+		} else {
+			fmt.Printf(
+				"[%s] %s\n",
+				color.GreenString("✓"),
+				dst,
+			)
 		}
 	}
 }

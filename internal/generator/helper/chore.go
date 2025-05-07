@@ -21,6 +21,13 @@ func StrIf(condition bool, str string) string {
 	return ""
 }
 
+func StrOrEmpty(str *string) string {
+	if str == nil {
+		return ""
+	}
+	return *str
+}
+
 func CodeIf(condition bool, code Code) Code {
 	if condition {
 		return code

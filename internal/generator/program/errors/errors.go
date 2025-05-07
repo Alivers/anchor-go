@@ -17,7 +17,7 @@ func GenerateErrors(ctx *model.GenerateCtx, program *idl.Idl) *File {
 			group.Add(Id(name).Op("=").Op("&").Id("customErrorDef").Values(Dict{
 				Id("code"): Lit(errDef.Code),
 				Id("name"): Lit(errDef.Name),
-				Id("msg"):  Lit(errDef.Msg),
+				Id("msg"):  Lit(helper.StrOrEmpty(errDef.Msg)),
 			}))
 			errDict[Lit(errDef.Code)] = Id(name)
 		}
