@@ -75,7 +75,7 @@ type IdlConst struct {
 }
 
 type IdlErrorCode struct {
-	Code uint32  `json:"code"`
+	Code int     `json:"code"`
 	Name string  `json:"name"`
 	Msg  *string `json:"msg,omitempty"`
 }
