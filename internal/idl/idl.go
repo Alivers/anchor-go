@@ -85,7 +85,7 @@ type IdlDiscriminator []byte
 // !!! Notice: `Discriminant` is not in the original spec.
 type IdlDiscriminant struct {
 	Type  string `json:"type"`
-	Value string `json:"value"`
+	Value uint   `json:"value"`
 }
 
 func (idl *Idl) FindTypeByName(name string) *IdlTypeDef {

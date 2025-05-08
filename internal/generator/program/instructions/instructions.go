@@ -91,9 +91,9 @@ func addInstructionEnum(ctx *model.GenerateCtx, file *File, program *idl.Idl) {
 
 		switch ctx.DiscriminatorType {
 		case model.DiscriminatorTypeUint8:
-			ins.Uint8().Op("=").Lit(instruction.Discriminant.Value).Line()
+			ins.Uint8().Op("=").Lit(uint8(instruction.Discriminant.Value)).Line()
 		case model.DiscriminatorTypeUvarint32, model.DiscriminatorTypeUint32:
-			ins.Uint32().Op("=").Lit(instruction.Discriminant.Value).Line()
+			ins.Uint32().Op("=").Lit(uint32(instruction.Discriminant.Value)).Line()
 		case model.DiscriminatorTypeAnchor:
 			ins.Op("=").Qual(model.PkgDfuseBinary, "TypeID").Call(
 				Index(Lit(8)).Byte().Op("{").ListFunc(func(byteGroup *Group) {

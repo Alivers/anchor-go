@@ -85,8 +85,8 @@ func generateComplexEnumCode(ctx *model.GenerateCtx, enumTypeName string, enumDe
 			})
 
 			for i, variant := range enumDef.Variants {
-				enumVariantNames[i] = helper.ToCamelCase(variant.Name)
-				structGroup.Id(enumVariantNames[i]).Id(GetComplexEnumVariantTypeName(enumTypeName, variant.Name))
+				enumVariantNames[i] = GetComplexEnumVariantTypeName(enumTypeName, variant.Name)
+				structGroup.Id(helper.ToCamelCase(variant.Name)).Id(enumVariantNames[i])
 			}
 		},
 	).Line().Line()
@@ -97,7 +97,7 @@ func generateComplexEnumCode(ctx *model.GenerateCtx, enumTypeName string, enumDe
 
 		// Declare the enum variant types:
 		if variant.IsUint8Variant() {
-			code.Type().Id(variantTypeNameComplex).Uint8().Line().Line()
+			code.Type().Id(variantTypeNameComplex).Uint8()
 		} else {
 			code.Type().Id(variantTypeNameComplex).StructFunc(
 				func(structGroup *Group) {
@@ -126,8 +126,10 @@ func generateComplexEnumCode(ctx *model.GenerateCtx, enumTypeName string, enumDe
 						}
 					}
 				},
-			).Line().Line()
+			)
 		}
+
+		code.Line().Line()
 
 		if variant.IsUint8Variant() {
 			// Uint8 Enum' serialization is handled by the base type (uint8), leave them empty
@@ -144,8 +146,7 @@ func generateComplexEnumCode(ctx *model.GenerateCtx, enumTypeName string, enumDe
 				).
 				BlockFunc(func(body *Group) {
 					body.Return(Nil())
-				})
-			code.Line().Line()
+				}).Line()
 
 			// Declare UnmarshalWithDecoder
 			code.Func().Params(Id("obj").Op("*").Id(variantTypeNameComplex)).Id("UnmarshalWithDecoder").
@@ -157,10 +158,9 @@ func generateComplexEnumCode(ctx *model.GenerateCtx, enumTypeName string, enumDe
 				).
 				BlockFunc(func(body *Group) {
 					body.Return(Nil())
-				})
-			code.Line().Line()
+				}).Line()
 		} else {
-			code.Line().Line().Add(
+			code.Add(
 				GenerateMarshalWithEncoderForStruct(
 					ctx,
 					variantTypeNameComplex,
@@ -169,9 +169,9 @@ func generateComplexEnumCode(ctx *model.GenerateCtx, enumTypeName string, enumDe
 					true,
 					program,
 				),
-			)
+			).Line()
 
-			code.Line().Line().Add(
+			code.Add(
 				GenerateUnmarshalWithDecoderForStruct(
 					ctx,
 					variantTypeNameComplex,
@@ -180,16 +180,19 @@ func generateComplexEnumCode(ctx *model.GenerateCtx, enumTypeName string, enumDe
 					nil,
 					program,
 				),
-			)
-
+			).Line()
 		}
+
+		code.Line()
 
 		// Declare the method to implement the parent enum interface:
 		if variant.IsUint8Variant() {
-			code.Func().Params(Id("_").Op("*").Id(variantTypeNameComplex)).Id(interfaceMethodName).Params().Block().Line().Line()
+			code.Func().Params(Id("_").Op("*").Id(variantTypeNameComplex)).Id(interfaceMethodName).Params().Block()
 		} else {
-			code.Func().Params(Id("_").Op("*").Id(variantTypeNameComplex)).Id(interfaceMethodName).Params().Block().Line().Line()
+			code.Func().Params(Id("_").Op("*").Id(variantTypeNameComplex)).Id(interfaceMethodName).Params().Block()
 		}
+
+		code.Line().Line()
 	}
 
 	return code
