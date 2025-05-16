@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/alivers/anchor-go/internal/generator/helper"
+	"github.com/alivers/anchor-go/internal/generator/idlcode"
 	"github.com/alivers/anchor-go/internal/generator/model"
 	"github.com/alivers/anchor-go/internal/idl"
 	. "github.com/dave/jennifer/jen"
@@ -96,8 +97,9 @@ func GenerateConstants(ctx *model.GenerateCtx, program *idl.Idl) *File {
 			file.Lit(v)
 		case idl.IdlTypeSimplePubkey:
 			file.Qual(model.PkgSolanaGo, "MustPublicKeyFromBase58").Call(Lit(c.Value))
-		default:
-			panic(fmt.Sprintf("unsupportd constant: %s", spew.Sdump(c)))
+		case idl.IdlTypeSimpleBytes:
+			values := helper.BytesStrToBytes(c.Value)
+			file.Index().Byte().Values(idlcode.IdlBytesToValuesCode(values)...)
 		}
 	}
 

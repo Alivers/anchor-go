@@ -1,9 +1,12 @@
 package helper
 
 import (
+	"fmt"
 	"strconv"
+	"strings"
 
 	. "github.com/dave/jennifer/jen"
+	"github.com/davecgh/go-spew/spew"
 )
 
 func IntToStr(i int) string {
@@ -33,4 +36,18 @@ func CodeIf(condition bool, code Code) Code {
 		return code
 	}
 	return Null()
+}
+
+func BytesStrToBytes(str string) []byte {
+	values := strings.Split(strings.TrimSuffix(strings.TrimPrefix(str, "["), "]"), ",")
+	bytes := make([]byte, len(values))
+	for i, v := range values {
+		v = strings.Trim(v, " ")
+		b, err := strconv.ParseUint(v, 10, 8)
+		if err != nil {
+			panic(fmt.Sprintf("failed to parse constant: %s", spew.Sdump(err, str)))
+		}
+		bytes[i] = byte(b)
+	}
+	return bytes
 }
