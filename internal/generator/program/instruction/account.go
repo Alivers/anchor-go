@@ -51,7 +51,7 @@ func generateInstAccountAccessorsCode(
 			body.Add(def)
 
 			body.Return().Id("inst")
-		})
+		}).Line()
 
 	code.Line()
 
@@ -75,7 +75,7 @@ func generateInstAccountAccessorsCode(
 		).
 		BlockFunc(func(body *Group) {
 			body.Return(Id("inst").Dot("AccountMetaSlice").Dot("Get").Call(Lit(accountIndex)))
-		})
+		}).Line()
 
 	return code
 }
@@ -187,7 +187,7 @@ func generateInstPdaAccountAddressDerivationCode(
 			}))
 
 			body.Return()
-		})
+		}).Line()
 
 	code.Func().Params(Id("inst").Op("*").Id(derivationReceiverName)).Id("Must" + derivationWithBumpSeedName).
 		ParamsFunc(func(group *Group) {
@@ -212,7 +212,7 @@ func generateInstPdaAccountAddressDerivationCode(
 			body.Add(If(Id("err").Op("!=").Nil()).Block(Panic(Id("err"))))
 
 			body.Return()
-		})
+		}).Line()
 
 	code.Commentf("%s finds %s account address with given seeds.", derivationExportedName, accountExportedName).Line()
 	code.Func().Params(Id("inst").Op("*").Id(derivationReceiverName)).Id(derivationExportedName).
@@ -238,7 +238,7 @@ func generateInstPdaAccountAddressDerivationCode(
 			}))
 
 			body.Return()
-		})
+		}).Line()
 
 	code.Func().Params(Id("inst").Op("*").Id(derivationReceiverName)).Id("Must" + derivationExportedName).
 		ParamsFunc(func(group *Group) {
@@ -263,7 +263,7 @@ func generateInstPdaAccountAddressDerivationCode(
 			body.Add(If(Id("err").Op("!=").Nil()).Block(Panic(Id("err"))))
 
 			body.Return()
-		})
+		}).Line()
 
 	return code
 }

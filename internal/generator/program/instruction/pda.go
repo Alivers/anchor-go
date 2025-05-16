@@ -90,7 +90,7 @@ func resolveInstructionAccountSeed(seed *idl.IdlSeed, instAccounts []*idl.IdlIns
 					if account.Address != nil && *account.Address != "" {
 						return &pdaSeedValue{
 							OriginIdlSeed: seed,
-							SeedConst:     ag_solanago.PublicKeyFromBytes([]byte(*account.Address)).Bytes(),
+							SeedConst:     ag_solanago.MustPublicKeyFromBase58(*account.Address).Bytes(),
 							SeedRef:       nil,
 						}
 					} else {
