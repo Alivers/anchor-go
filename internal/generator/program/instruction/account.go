@@ -122,12 +122,20 @@ func generateInstPdaAccountAddressDerivationCode(
 					body.Add(Id("seeds").Op("=").Append(Id("seeds"), Index().Byte().Values(idlcode.IdlBytesToValuesCode(seed.SeedConst)...)))
 				} else {
 					seedRef := seed.SeedRef
-					// seedTyp := seedRef.RefType
-					body.Commentf("path: %s", seedRef.SeedRefPath)
-					// res, err := ag_solanago.MarshalBorsh(seedRef.SeedRefName)
-					body.Add(List(Id("res"), Id("err")).Op(":=").Qual(model.PkgDfuseBinary, "MarshalBorsh").Call(Id(seedRef.SeedRefName)))
-					body.Add(If(Id("err").Op("!=").Nil()).Block(Return(Id("err"))))
-					body.Add(Id("seeds")).Op("=").Append(Id("seeds"), Id("res"))
+					if seedRef.RefType.IsSimple() && seedRef.RefType.GetSimple() == idl.IdlTypeSimplePubkey {
+						body.Add(Id("seeds").Op("=").Append(Id("seeds"), Id(seedRef.SeedRefName).Dot("Bytes").Call()))
+					} else {
+						body.Block(
+							// seedTyp := seedRef.RefType
+							Commentf("path: %s", seedRef.SeedRefPath),
+							// var res []byte
+							// res, err = ag_solanago.MarshalBorsh(seedRef.SeedRefName)
+							Var().Id("res").Index().Byte(),
+							List(Id("res"), Id("err")).Op("=").Qual(model.PkgDfuseBinary, "MarshalBorsh").Call(Id(seedRef.SeedRefName)),
+							If(Id("err").Op("!=").Nil()).Block(Return()),
+							Id("seeds").Op("=").Append(Id("seeds"), Id("res")),
+						)
+					}
 				}
 			}
 
