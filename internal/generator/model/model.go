@@ -54,13 +54,13 @@ func (ctx *GenerateCtx) SetComplexEnum(name string) {
 	ctx.ComplexEnumRegistry.Add(name)
 }
 
-func (ctx *GenerateCtx) IsComplexEnum(name string) bool {
-	return ctx.ComplexEnumRegistry.Contains(name)
+func (ctx *GenerateCtx) IsComplexEnumByTypeName(typeName string) bool {
+	return ctx.ComplexEnumRegistry.Contains(typeName)
 }
 
 func (ctx *GenerateCtx) IsComplexEnumByType(typ *idl.IdlType) bool {
 	if typ.IsDefined() {
-		return ctx.IsComplexEnum(typ.GetDefined().Name)
+		return ctx.IsComplexEnumByTypeName(typ.GetDefined().Name)
 	}
 	return false
 }

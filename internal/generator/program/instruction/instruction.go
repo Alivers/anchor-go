@@ -51,7 +51,7 @@ func addInstructionStruct(ctx *model.GenerateCtx, file *File, instExportedName s
 			for _, doc := range arg.Docs {
 				fieldsGroup.Line().Comment(doc)
 			}
-			isComplexEnum := ctx.IsComplexEnum(arg.Name)
+			isComplexEnum := ctx.IsComplexEnumByType(&arg.Type)
 			fieldsGroup.Add(idlcode.IdlFieldToCode(arg, idlcode.FieldCodeOption{AsPointer: true, ComplexEnum: isComplexEnum}))
 		}
 		fieldsGroup.Line()
@@ -130,7 +130,7 @@ func addInstructionArgsSetter(ctx *model.GenerateCtx, file *File, instExportedNa
 				body.Id("inst").Dot(exportedArgName).Op("=").
 					Add(func() Code {
 						// Complex enum should be a interface, don't use ref `&`.
-						if ctx.IsComplexEnum(arg.Name) {
+						if ctx.IsComplexEnumByType(&arg.Type) {
 							return nil
 						}
 						return Op("&")

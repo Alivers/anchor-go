@@ -209,9 +209,12 @@ func GenerateUnmarshalWithDecoderForStruct(
 				} else {
 					if field.Type.IsOption() {
 						body.BlockFunc(func(optGroup *Group) {
+							// For optional fields, we need to check if there is remaining data.
+							// then read the bool to check if the field is nil or not.
+							// if not nil(bool is true), then read the field value.
 							optGroup.If(Op("!").Id("decoder").Dot("HasRemaining").Call()).Block(
 								Return(Nil()),
-							).Line()
+							)
 							// if nil:
 							optGroup.List(Id("ok"), Err()).Op(":=").Id("decoder").Dot("ReadBool").Call()
 							optGroup.If(Err().Op("!=").Nil()).Block(
@@ -224,6 +227,15 @@ func GenerateUnmarshalWithDecoderForStruct(
 								),
 							)
 						})
+					} else if field.Type.IsSimple() && field.Type.GetSimple() == idl.IdlTypeSimpleBool {
+						// Special case for bool, we need to check if there is remaining data.
+						body.If(Op("!").Id("decoder").Dot("HasRemaining").Call()).Block(
+							Return(Nil()),
+						)
+						body.Err().Op("=").Id("decoder").Dot("Decode").Call(Op("&").Id("obj").Dot(exportedArgName))
+						body.If(Err().Op("!=").Nil()).Block(
+							Return(Err()),
+						)
 					} else {
 						body.Err().Op("=").Id("decoder").Dot("Decode").Call(Op("&").Id("obj").Dot(exportedArgName))
 						body.If(Err().Op("!=").Nil()).Block(
