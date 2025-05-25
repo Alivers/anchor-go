@@ -190,7 +190,7 @@ func GenerateUnmarshalWithDecoderForStruct(
 											BlockFunc(func(caseGroup *Group) {
 												caseGroup.Id("obj").Dot(exportedArgName).Op("=").
 													Parens(Op("*").Id(variantTypeNameComplex)).
-													Parens(Op("&").Id("tmp").Dot("Enum"))
+													Parens(Op("&").Id("tmp").Dot(variant.Name))
 											})
 									} else {
 										switchGroup.Case(Lit(variantIndex)).
