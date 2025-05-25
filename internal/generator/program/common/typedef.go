@@ -97,7 +97,7 @@ func generateComplexEnumCode(ctx *model.GenerateCtx, enumTypeName string, enumDe
 
 		// Declare the enum variant types:
 		if variant.IsUint8Variant() {
-			code.Type().Id(variantTypeNameComplex).Uint8()
+			code.Type().Id(variantTypeNameComplex).Struct()
 		} else {
 			code.Type().Id(variantTypeNameComplex).StructFunc(
 				func(structGroup *Group) {
