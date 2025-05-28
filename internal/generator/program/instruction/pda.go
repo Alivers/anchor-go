@@ -112,7 +112,7 @@ func resolveInstructionAccountSeed(seed *idl.IdlSeed, instAccounts []*idl.IdlIns
 			if len(fieldParts) != 2 {
 				panic(fmt.Sprintf("[IdlSeedAccount]Invalid account path to split by accesor: %v", accountSeed.Path))
 			}
-			fieldType := findStructFieldTypeInProgramTypes(fieldParts[0], fieldParts[1], program.Types)
+			fieldType := findStructFieldTypeInProgramTypes(*accountSeed.Account, fieldParts[1], program.Types)
 			if fieldType == nil {
 				panic(fmt.Sprintf("[IdlSeedAccount]Type definition not found in program types for: %s.%s", fieldParts[0], fieldParts[1]))
 			}
