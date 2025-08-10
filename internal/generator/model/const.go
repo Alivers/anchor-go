@@ -14,6 +14,7 @@ const (
 	PkgEncodingBinary = "encoding/binary"
 	PkgFmt            = "fmt"
 	PkgBytes          = "bytes"
+	PkgBigInt         = "math/big"
 )
 
 type DiscriminatorType string
