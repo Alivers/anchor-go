@@ -8,7 +8,7 @@ require (
 	github.com/deckarep/golang-set/v2 v2.8.0
 	github.com/fatih/color v1.18.0
 	github.com/gagliardetto/binary v0.8.0
-	github.com/gagliardetto/solana-go v1.12.0
+	github.com/gagliardetto/solana-go v1.13.0
 	github.com/gagliardetto/utilz v0.1.3
 )
 
