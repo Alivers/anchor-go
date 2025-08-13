@@ -11,6 +11,7 @@ import (
 
 var src = flag.String("src", "", "Path to source; can use multiple times.")
 var dst = flag.String("dst", "generated", "Destination folder, the program name will be the folder for the genrated files")
+var skipOptionalFlag = flag.Bool("skip-optional-flag", false, "whether to skip optional flag when encoding or decoding optional fields")
 var generateTests = flag.Bool("tests", true, "Generate tests")
 
 func main() {
@@ -28,5 +29,5 @@ func main() {
 		panic(err)
 	}
 
-	generator.Generate(*dst, *generateTests, program)
+	generator.Generate(*dst, *generateTests, *skipOptionalFlag, program)
 }

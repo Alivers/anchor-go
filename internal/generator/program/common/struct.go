@@ -75,30 +75,40 @@ func GenerateMarshalWithEncoderForStruct(
 					if field.Type.IsOption() {
 						if checkFieldNil {
 							body.BlockFunc(func(optGroup *Group) {
-								// if nil:
-								optGroup.If(Id("obj").Dot(helper.ToCamelCase(field.Name)).Op("==").Nil()).Block(
-									Err().Op("=").Id("encoder").Dot("WriteBool").Call(False()),
-									If(Err().Op("!=").Nil()).Block(
-										Return(Err()),
-									),
-								).Else().Block(
-									Err().Op("=").Id("encoder").Dot("WriteBool").Call(True()),
-									If(Err().Op("!=").Nil()).Block(
-										Return(Err()),
-									),
-									Err().Op("=").Id("encoder").Dot("Encode").Call(Id("obj").Dot(exportedArgName)),
-									If(Err().Op("!=").Nil()).Block(
-										Return(Err()),
-									),
-								)
+								if !ctx.SkipOptionalFlag {
+									optGroup.If(Id("obj").Dot(helper.ToCamelCase(field.Name)).Op("==").Nil()).Block(
+										Err().Op("=").Id("encoder").Dot("WriteBool").Call(False()),
+										If(Err().Op("!=").Nil()).Block(
+											Return(Err()),
+										),
+									).Else().Block(
+										Err().Op("=").Id("encoder").Dot("WriteBool").Call(True()),
+										If(Err().Op("!=").Nil()).Block(
+											Return(Err()),
+										),
+										Err().Op("=").Id("encoder").Dot("Encode").Call(Id("obj").Dot(exportedArgName)),
+										If(Err().Op("!=").Nil()).Block(
+											Return(Err()),
+										),
+									)
+								} else {
+									optGroup.If(Id("obj").Dot(helper.ToCamelCase(field.Name)).Op("==").Nil()).Block().Else().Block(
+										Err().Op("=").Id("encoder").Dot("Encode").Call(Id("obj").Dot(exportedArgName)),
+										If(Err().Op("!=").Nil()).Block(
+											Return(Err()),
+										),
+									)
+								}
 							})
 						} else {
 							body.BlockFunc(func(optGroup *Group) {
-								// Write as if not nil:
-								optGroup.Err().Op("=").Id("encoder").Dot("WriteBool").Call(True())
-								optGroup.If(Err().Op("!=").Nil()).Block(
-									Return(Err()),
-								)
+								if !ctx.SkipOptionalFlag {
+									optGroup.Err().Op("=").Id("encoder").Dot("WriteBool").Call(True())
+									optGroup.If(Err().Op("!=").Nil()).Block(
+										Return(Err()),
+									)
+								}
+
 								optGroup.Err().Op("=").Id("encoder").Dot("Encode").Call(Id("obj").Dot(exportedArgName))
 								optGroup.If(Err().Op("!=").Nil()).Block(
 									Return(Err()),
@@ -215,17 +225,23 @@ func GenerateUnmarshalWithDecoderForStruct(
 							optGroup.If(Op("!").Id("decoder").Dot("HasRemaining").Call()).Block(
 								Return(Nil()),
 							)
-							// if nil:
-							optGroup.List(Id("ok"), Err()).Op(":=").Id("decoder").Dot("ReadBool").Call()
-							optGroup.If(Err().Op("!=").Nil()).Block(
-								Return(Err()),
-							)
-							optGroup.If(Id("ok")).Block(
-								Err().Op("=").Id("decoder").Dot("Decode").Call(Op("&").Id("obj").Dot(exportedArgName)),
+
+							decodeCode := []Code{
+								Err().Op("=").Id("decoder").Dot("Decode").Call(Op("&").Id("obj").Dot(exportedArgName)).Line(),
 								If(Err().Op("!=").Nil()).Block(
 									Return(Err()),
 								),
-							)
+							}
+
+							if !ctx.SkipOptionalFlag {
+								optGroup.List(Id("ok"), Err()).Op(":=").Id("decoder").Dot("ReadBool").Call()
+								optGroup.If(Err().Op("!=").Nil()).Block(
+									Return(Err()),
+								)
+								optGroup.If(Id("ok")).Block(decodeCode...)
+							} else {
+								optGroup.Add(decodeCode...)
+							}
 						})
 					} else if field.Type.IsSimple() && field.Type.GetSimple() == idl.IdlTypeSimpleBool {
 						// Special case for bool, we need to check if there is remaining data.

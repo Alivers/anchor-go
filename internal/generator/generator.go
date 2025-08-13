@@ -24,7 +24,7 @@ import (
 	"github.com/dave/jennifer/jen"
 )
 
-func Generate(dstFolder string, generateTests bool, program *idl.Idl) {
+func Generate(dstFolder string, generateTests, skipOptionalFlag bool, program *idl.Idl) {
 	pkgName := helper.ToRustSnakeCase(program.Metadata.Name)
 	dstFolder = path.Join(dstFolder, pkgName)
 
@@ -33,6 +33,7 @@ func Generate(dstFolder string, generateTests bool, program *idl.Idl) {
 		program.Metadata.Name,
 		deriveDiscriminatorType(program),
 		model.EncoderTypeBorsh,
+		skipOptionalFlag,
 	)
 
 	registerIdentifiers(ctx, program)

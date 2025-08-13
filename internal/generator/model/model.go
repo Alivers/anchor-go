@@ -10,6 +10,7 @@ type GenerateCtx struct {
 	ProgramName       string
 	DiscriminatorType DiscriminatorType
 	Encoder           EncoderType
+	SkipOptionalFlag  bool
 
 	AddressTable                map[string]string
 	IdentifierTypeRegistry      map[string]*idl.IdlTypeDefTy
@@ -20,12 +21,13 @@ type GenerateCtx struct {
 	ComplexEnumRegistry mapset.Set[string]
 }
 
-func NewGenerateCtx(packageName, programName string, discriminatorType DiscriminatorType, encoder EncoderType) *GenerateCtx {
+func NewGenerateCtx(packageName, programName string, discriminatorType DiscriminatorType, encoder EncoderType, skipOptionalFlag bool) *GenerateCtx {
 	ctx := &GenerateCtx{
 		PkgName:                     packageName,
 		ProgramName:                 programName,
 		DiscriminatorType:           discriminatorType,
 		Encoder:                     encoder,
+		SkipOptionalFlag:            skipOptionalFlag,
 		AddressTable:                map[string]string{},
 		IdentifierTypeRegistry:      map[string]*idl.IdlTypeDefTy{},
 		GeneratedIdentifierRegistry: mapset.NewSet[string](),
